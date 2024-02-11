@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js MySQL App</title>
+</head>
+
+<body>
+  <h1>Node.js MySQL App</h1>
+
+  <h2>Insert Record</h2>
+  <form id="insertForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <button type="submit">Insert Record</button>
+  </form>
+
+  <h2>Data from Database</h2>
+  <ul id="dataList"></ul>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const insertForm = document.getElementById('insertForm');
+      const dataList = document.getElementById('dataList');
+
+      insertForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const nameInput = document.getElementById('name');
+        const name = nameInput.value;
+
+        try {
+          const response = await fetch('/insert_record', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name }),
+          });
+
+          if (response.ok) {
+            alert('Record inserted successfully!');
+            nameInput.value = '';
+          } else {
+            alert('Error inserting record');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+
+      async function fetchData() {
+        try {
+          const response = await fetch('/data');
+          const data = await response.json();
+
+          dataList.innerHTML = '';
+          data.forEach((record) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `ID: ${record.id}, Name: ${record.name}`;
+            dataList.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+
+      fetchData();
+    });
+  </script>
+</body>
+
+</html>
